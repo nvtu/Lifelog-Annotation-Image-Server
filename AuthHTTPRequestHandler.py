@@ -37,7 +37,7 @@ class AuthHTTPRequestHandler(SimpleHTTPRequestHandler):
         print("send bearer auth header")
         self.send_response(401)
         self.send_header('WWW-Authenticate', 'Bearer realm=\"Deakin\"')
-        self.send_header('Content-type', 'application/json') 
+        self.send_header('Content-type', 'application/json')
         self.end_headers()
 
 
@@ -82,6 +82,9 @@ class AuthHTTPRequestHandler(SimpleHTTPRequestHandler):
             user_id = payload['user_id']
             jwt_token = self.server.get_jwt_token(user_id).decode('ascii')
             if auth_key == jwt_token:
+                self.send_response(200, 'Ok')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                # self.end_headers()
                 SimpleHTTPRequestHandler.do_GET(self)
                 return
         except Exception:
@@ -116,3 +119,14 @@ class AuthHTTPRequestHandler(SimpleHTTPRequestHandler):
                     return
                 self.do_BASIC_AUTH_HEAD()
                 self.wfile.write(bytes('No Authentication Header Received', 'utf-8'))
+    
+
+    def do_OPTIONS(self):
+        self.send_response(200, 'Ok')
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Methods', 'GET, OPTIONS')
+        self.send_header('Access-Control-Allow-Headers', 'X-Requested-With')
+        self.send_header('Access-Control-Allow-Headers', 'Authorization')
+        self.send_header("Access-Control-Allow-Credentials", "true")
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type')
+        self.end_headers()
