@@ -38,6 +38,7 @@ class AuthHTTPRequestHandler(SimpleHTTPRequestHandler):
         self.send_response(401)
         self.send_header('WWW-Authenticate', 'Bearer realm=\"Deakin\"')
         self.send_header('Content-type', 'application/json')
+        self.send_header('Access-Control-Allow-Origin', '*')
         self.end_headers()
 
 
