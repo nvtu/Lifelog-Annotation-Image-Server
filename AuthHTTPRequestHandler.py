@@ -105,19 +105,12 @@ class AuthHTTPRequestHandler(SimpleHTTPRequestHandler):
         else:
             authorization_str = self.headers.get('Authorization')
             first_part_auth, second_part_auth = authorization_str.split()
-            if fetch_mode == 'cors':
+            if first_part_auth == 'Bearer':
                 # Bearer OAuth 2.0 Authentication processing
-                if first_part_auth == 'Bearer':
-                    self.__bearer_auth_processing(second_part_auth)
-                    return
-                self.do_BEARER_AUTH_HEAD()
-                response = { 'error': "No Authentication Header Received" }
-                self.wfile.write(bytes(json.dumps(response), 'utf-8'))
+                self.__bearer_auth_processing(second_part_auth)
+            elif first_part_auth == 'Basic':
+                self.__basic_auth_processing(second_part_auth)
             else:
-                # Basic Authentication processing
-                if first_part_auth == 'Basic':
-                    self.__basic_auth_processing(second_part_auth)
-                    return
                 self.do_BASIC_AUTH_HEAD()
                 self.wfile.write(bytes('No Authentication Header Received', 'utf-8'))
     
